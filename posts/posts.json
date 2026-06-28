@@ -1,5 +1,6 @@
 [
   { "id": "hello-world", "file": "hello-world.md" },
   { "id": "todays-learning", "file": "todays-learning.md" },
-  { "id": "weather-today", "file": "weather-today.md" }
+  { "id": "weather-today", "file": "weather-today.md" },
+  { "id": "permission-rules", "file": "permission-rules.md" }
 ]
