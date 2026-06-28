@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="index.html">Blog</a>
+    <button id="theme-toggle" aria-label="다크모드 전환">🌙</button>
+  </header>
+
+  <main>
+    <a class="back-link" href="index.html">← 목록으로</a>
+    <article id="post-content">
+      <p class="state-message">글을 불러오는 중...</p>
+    </article>
+  </main>
+
+  <script src="js/vendor/marked.min.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/post.js"></script>
+</body>
+</html>
