@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>픽셀 아트 에디터</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <a href="../../index.html">← Blog로 돌아가기</a>
+    <h1>픽셀 아트 에디터</h1>
+    <button id="theme-toggle" aria-label="테마 전환">🌙</button>
+  </header>
+
+  <main class="editor-layout">
+    <!-- 툴바 -->
+    <aside class="toolbar">
+      <button class="tool-btn active" data-tool="pen" title="펜 (P)">
+        펜<span class="shortcut">P</span>
+      </button>
+      <button class="tool-btn" data-tool="eraser" title="지우개 (E)">
+        지우개<span class="shortcut">E</span>
+      </button>
+      <button class="tool-btn" data-tool="bucket" title="버킷 채우기 (B)">
+        버킷<span class="shortcut">B</span>
+      </button>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="undo-redo">
+        <button id="btn-undo" title="실행 취소 (Ctrl+Z)" disabled>↩</button>
+        <button id="btn-redo" title="다시 실행 (Ctrl+Y)" disabled>↪</button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <button id="btn-export" title="PNG로 저장 (Ctrl+S)">PNG 저장</button>
+      <button id="btn-clear" title="캔버스 초기화">초기화</button>
+    </aside>
+
+    <!-- 캔버스 -->
+    <section class="canvas-area">
+      <canvas id="pixel-canvas" aria-label="픽셀 아트 캔버스"></canvas>
+    </section>
+
+    <!-- 팔레트 -->
+    <aside class="palette-panel">
+      <h3>현재 색상</h3>
+      <div id="current-color-preview" class="current-color-preview"></div>
+
+      <h3>팔레트</h3>
+      <div id="palette-grid" class="palette-grid"></div>
+
+      <button id="btn-add-color">+ 색상 추가</button>
+      <input type="color" id="color-input" value="#000000" />
+    </aside>
+  </main>
+
+  <!-- 스크립트 로드 순서: palette → editor → tools → ui -->
+  <script src="palette.js"></script>
+  <script src="editor.js"></script>
+  <script src="tools.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
