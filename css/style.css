@@ -67,6 +67,45 @@ main {
   padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 1.5rem);
 }
 
+/* Apps section */
+.apps-section {
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.app-card {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--bg-alt);
+}
+
+.app-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.app-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
 /* Post list */
 .post-card {
   display: block;
