@@ -13,11 +13,6 @@ on:
           - run
           - verify
           - test-notify
-      test_date:
-        description: '테스트용 출발일 (YYYY-MM-DD, 비우면 실제 대상 날짜). 실제 감시 상태와 분리됨'
-        type: string
-        required: false
-        default: ''
 
 concurrency:
   group: valet-monitor
@@ -51,7 +46,6 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           STATE_FILE: .state/valet-state.json
           MODE: ${{ github.event.inputs.mode || 'run' }}
-          TARGET_DATE_OVERRIDE: ${{ github.event.inputs.test_date }}
         run: |
           case "$MODE" in
             verify) python3 tools/valet-monitor/monitor.py --verify ;;
