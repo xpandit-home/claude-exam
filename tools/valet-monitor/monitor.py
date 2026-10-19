@@ -5,6 +5,7 @@
 환경변수: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, STATE_FILE
 """
 import argparse
+import datetime
 import json
 import os
 import re
@@ -29,6 +30,9 @@ BACKOFF_BASE = 2         # 2s, 4s, 8s
 FAIL_ALERT_THRESHOLD = 12   # 5분 간격 기준 약 1시간
 HEARTBEAT_INTERVAL = 2 * 60 * 60   # 정상 동작 확인 메시지 주기(초)
 HEARTBEAT_TOLERANCE = 120          # 스케줄 지터로 주기가 밀리지 않도록 허용하는 오차(초)
+KST = datetime.timezone(datetime.timedelta(hours=9))
+QUIET_START_HOUR = 0               # 이 시각(포함)부터
+QUIET_END_HOUR = 7                 # 이 시각(미포함)까지는 확인 메시지를 보내지 않는다 (한국 시간)
 DEFAULT_STATE_FILE = ".state/valet-state.json"
 DEFAULT_STATE = {"available": None, "fail_count": 0, "alerted_fail": False, "last_heartbeat": None}
 
@@ -162,7 +166,10 @@ def maybe_heartbeat(state, state_path, summary, mock_mode):
     last = state.get("last_heartbeat")
     if last is not None and now - last < HEARTBEAT_INTERVAL - HEARTBEAT_TOLERANCE:
         return
-    send_telegram("[모니터링 동작 중] {}\n{}\n(이 확인 메시지는 2시간마다 옵니다)".format(TARGET_LABEL, summary), mock_mode)
+    hour = datetime.datetime.fromtimestamp(now, KST).hour
+    if QUIET_START_HOUR <= hour < QUIET_END_HOUR:
+        return  # 마지막 전송 시각은 그대로 두므로 07시 이후 첫 실행에서 바로 전송된다
+    send_telegram("[모니터링 동작 중] {}\n{}\n(이 확인 메시지는 2시간마다 옵니다. 0~7시 제외)".format(TARGET_LABEL, summary), mock_mode)
     state["last_heartbeat"] = now
     save_state(state_path, state)
 
