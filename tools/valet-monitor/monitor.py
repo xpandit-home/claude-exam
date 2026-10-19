@@ -20,7 +20,15 @@ BOOKING_URL = "https://valet.amanopark.co.kr/booking"
 TARGET_DATE = "2026-10-24"
 TARGET_TYPE = "BASIC"
 TARGET_DATE_TYPE = "departing_at"
-TARGET_LABEL = "출발일 {} 일반(BASIC)".format(TARGET_DATE)
+
+# 수동 테스트용: 환경변수 TARGET_DATE_OVERRIDE(YYYY-MM-DD)로 날짜를 바꿀 수 있다.
+# 이 경우 실제 감시 상태와 섞이지 않도록 상태 파일도 분리한다.
+DATE_OVERRIDE = os.environ.get("TARGET_DATE_OVERRIDE", "").strip()
+if DATE_OVERRIDE:
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", DATE_OVERRIDE):
+        sys.exit("TARGET_DATE_OVERRIDE 형식 오류 (YYYY-MM-DD)")
+    TARGET_DATE = DATE_OVERRIDE
+TARGET_LABEL = "출발일 {} 일반(BASIC)".format(TARGET_DATE) + (" [날짜 테스트]" if DATE_OVERRIDE else "")
 
 USER_AGENT = "valet-monitor/1.0 (personal availability notifier)"
 TIMEOUT = 10
@@ -208,7 +216,10 @@ def main():
             send_telegram("[테스트] 주차대행 모니터링 알림 테스트입니다.")
             return 0
         mock = None if args.mock_response is None else args.mock_response == "true"
-        return run_monitor(os.environ.get("STATE_FILE", DEFAULT_STATE_FILE), mock)
+        state_path = os.environ.get("STATE_FILE", DEFAULT_STATE_FILE)
+        if DATE_OVERRIDE:
+            state_path = os.path.join(os.path.dirname(state_path), "test-{}.json".format(DATE_OVERRIDE))
+        return run_monitor(state_path, mock)
     except RuntimeError as e:
         log("오류: {}".format(e))
         return 1
