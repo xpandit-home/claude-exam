@@ -18,7 +18,7 @@ GitHub Actions의 스케줄(cron)과 `Run workflow` 버튼은 **기본 브랜치
 ## 4. 수동 실행 (Actions 탭 -> valet-monitor -> Run workflow)
 - `test-notify`: 테스트 메시지 전송 (Secrets 확인)
 - `verify`: 원문 응답 상태코드/본문 앞 500자 확인 (`dateType` 포함/생략 비교, 알림 없음). 브라우저의 실제 마감 여부와 대조해 true=가능 여부를 확정할 것
-- `run`: 일반 실행 (10분마다 자동으로도 실행됨)
+- `run`: 일반 실행 (5분마다 자동으로도 실행됨. 2시간마다 "동작 중" 확인 메시지가 텔레그램으로 옴)
 
 로컬 모의 테스트 (토큰 없이 dry-run):
 `STATE_FILE=/tmp/s.json python3 tools/valet-monitor/monitor.py --mock-response true`

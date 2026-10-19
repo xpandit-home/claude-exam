@@ -26,9 +26,11 @@ USER_AGENT = "valet-monitor/1.0 (personal availability notifier)"
 TIMEOUT = 10
 MAX_RETRIES = 3          # 최초 시도 이후 재시도 횟수
 BACKOFF_BASE = 2         # 2s, 4s, 8s
-FAIL_ALERT_THRESHOLD = 6
+FAIL_ALERT_THRESHOLD = 12   # 5분 간격 기준 약 1시간
+HEARTBEAT_INTERVAL = 2 * 60 * 60   # 정상 동작 확인 메시지 주기(초)
+HEARTBEAT_TOLERANCE = 120          # 스케줄 지터로 주기가 밀리지 않도록 허용하는 오차(초)
 DEFAULT_STATE_FILE = ".state/valet-state.json"
-DEFAULT_STATE = {"available": None, "fail_count": 0, "alerted_fail": False}
+DEFAULT_STATE = {"available": None, "fail_count": 0, "alerted_fail": False, "last_heartbeat": None}
 
 
 def log(msg):
@@ -123,6 +125,7 @@ def load_state(path):
             "available": s["available"] if isinstance(s.get("available"), bool) else None,
             "fail_count": int(s.get("fail_count", 0)),
             "alerted_fail": bool(s.get("alerted_fail", False)),
+            "last_heartbeat": float(s["last_heartbeat"]) if isinstance(s.get("last_heartbeat"), (int, float)) and not isinstance(s.get("last_heartbeat"), bool) else None,
         }
     except FileNotFoundError:
         return dict(DEFAULT_STATE)
@@ -153,6 +156,17 @@ def run_verify():
     return 0
 
 
+def maybe_heartbeat(state, state_path, summary, mock_mode):
+    """마지막 확인 메시지로부터 HEARTBEAT_INTERVAL이 지났으면 정상 동작 확인 메시지를 보낸다."""
+    now = time.time()
+    last = state.get("last_heartbeat")
+    if last is not None and now - last < HEARTBEAT_INTERVAL - HEARTBEAT_TOLERANCE:
+        return
+    send_telegram("[모니터링 동작 중] {}\n{}\n(이 확인 메시지는 2시간마다 옵니다)".format(TARGET_LABEL, summary), mock_mode)
+    state["last_heartbeat"] = now
+    save_state(state_path, state)
+
+
 def run_monitor(state_path, mock):
     mock_mode = mock is not None
     state = load_state(state_path)
@@ -173,6 +187,7 @@ def run_monitor(state_path, mock):
                 state["fail_count"], TARGET_LABEL), mock_mode)
             state["alerted_fail"] = True
         save_state(state_path, state)
+        maybe_heartbeat(state, state_path, "현재 조회 실패 {}회 연속 - 점검이 필요할 수 있습니다".format(state["fail_count"]), mock_mode)
         return 0
 
     # 성공 조회: 실패 상태 복구 처리
@@ -191,6 +206,7 @@ def run_monitor(state_path, mock):
 
     state["available"] = available
     save_state(state_path, state)
+    maybe_heartbeat(state, state_path, "현재 상태: {} (조회 정상)".format("예약 가능" if available else "마감"), mock_mode)
     return 0
 
 
